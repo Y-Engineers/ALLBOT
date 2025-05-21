@@ -41,8 +41,7 @@ int commandCode = 0; // For selected Command
 int times;                                // Global variable that stores part the received IR command
 int speedms;                              // Global variable that stores part the received IR command
 
-boolean IRreceive = false;                 // Set this to true if you want to use the IR remote
-boolean receivelog = false;               // Set this to true if you want to see the serial messages for debugging the IR commands
+boolean userControl = false;                 // Set this to true if you want to control it manually
 
 // ESP32 Communication vars
 #define SPEED_PIN A0
@@ -83,14 +82,6 @@ void setup()
 
   // Wait for joints to be initialized
   delay(500);
-
-  // Starting the hardware UART, necessary for receiving IR
-  if (IRreceive == true)                  // Check if required (when Serial is started servo1 connector will not work!)
-    {
-      Serial.begin(2400);
-      Serial.setTimeout(100);
-      Serial.println("serial communication started");
-    }
   
   // INIT the random seed, this is used to create random actions
   randomSeed(analogRead(5));
@@ -105,9 +96,9 @@ void setup()
 void loop()                               // Main program loop
 {
   
-  if (IRreceive == true)                  // Choose between IR commands or random action
+  if (userControl == true)                  // Choose between user commands or random action
     {
-      getcommand();                       // Listen for IR command
+      getcommand();                       // Listen for command
       executecommand();                   // Execute any receveid commands
     }
     else
@@ -210,27 +201,16 @@ void getcommand (void)                   // This is the routine that listens and
 
   commandCode = 0;
 
-  if (digital.read(COMMAND_PIN0)) {
+  if (digitalRead(COMMAND_PIN0)) {
       
   }
   
   command = "WF";
   
 }
+
 //--------------------------------------------------------------
-void resetserial (void)                  // This clears any received IR commands that where received in the serial buffer while the robot was execution a command.
-{
-  //resetting all variables
-  command = ""; // 0-4
-  times = 0; // A1
-  speedms = 0; // A0
-  
-  //flushing the serial buffer (64 byte) so there are no stored movements that need to be handled (annoying)...
-  while (Serial.available()) {
-    Serial.read();
-  }
-}
-//--------------------------------------------------------------
+
 void executecommand (void)                // Execute the commands that are stored in the global vars.
 { 
 
@@ -238,84 +218,72 @@ void executecommand (void)                // Execute the commands that are store
   if (command == "WF")
   {
     walkforward(times, (speedms*5));
-    resetserial();
   }
   else if (command == "WB")
   {
     walkbackward(times, (speedms*5));
-    resetserial();
   }
   else if (command == "WL")
   {
     walkleft(times, (speedms*5));
-    resetserial();
   }
   else if (command == "WR")
   {
     walkright(times, (speedms*5));
-    resetserial();
   }
   else if (command == "TR")
   {
     turnright(times, (speedms*5));
-    resetserial();
   }
   else if (command == "TL")
   {
     turnleft(times, (speedms*5));
-    resetserial();
   }
   else if (command == "LF")
   {
     leanforward(speedms*5);
-    resetserial();
   }
   else if (command == "LB")
   {
     leanbackward(speedms*5);
-    resetserial();
   }
   else if (command == "LL")
   {
     leanleft(speedms*5);
-    resetserial();
   }
   else if (command == "LR")
   {
     leanright(speedms*5);
-    resetserial();
   }
   else if (command == "FR")
   {
     wavefrontright(times, speedms*5);
-    resetserial();
   }
   else if (command == "FL")
   {
     wavefrontleft(times, speedms*5);
-    resetserial();
   }
   else if (command == "RR")
   {
     waverearright(times, speedms*5);
-    resetserial();
   }
   else if (command == "RL")
   {
     waverearleft(times, speedms*5);
-    resetserial();
   }
   else if (command == "SC")
   {
     scared(times, speedms);
-    resetserial();
   }
   else if (command == "CH")
   {
     chirp(times, speedms);
-    resetserial();
   }
 }
+
+
+//--------------------------------------------------------------
+// Movements
 //--------------------------------------------------------------
 void chirp(int beeps, int speedms){
 
