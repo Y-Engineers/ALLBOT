@@ -1,4 +1,22 @@
-﻿#include <Servo.h>                        // The ALLBOT library needs the servo.h library
+/*VR408
+ * Copyright (C) 2014 Velleman nv
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license.  See the LICENSE file for details.
+ *
+ * Note:
+ * -----
+ * for use on Arduino Uno  board, set jumpers to UNO  on VRSSM Shield!
+ * for use on Arduino Mega board, set jumpers to Mega on VRSSM Shield!
+ * 
+ */
+
+/*
+ * Modified by Morten Barthel, 2025
+ * See LICENSE for details.
+ */
+
+#include <Servo.h>                        // The ALLBOT library needs the servo.h library
 #include <ALLBOT.h>                       // Do not forget to include the ALLBOT library, download it from the manuals.velleman.eu website
 
 ALLBOT BOT(8);                            // Number of motors
