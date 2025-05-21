@@ -196,17 +196,39 @@ void loop()                               // Main program loop
    }
 }
 //--------------------------------------------------------------
-void getcommand (void)                   // This is the routine that listens and decodes any IR commands. Decodes commands end up in the global vars.
-{ 
+int readCommandCode() {
+  return (digitalRead(COMMAND_PIN1) << 0) |
+         (digitalRead(COMMAND_PIN2) << 1) |
+         (digitalRead(COMMAND_PIN3) << 2) |
+         (digitalRead(COMMAND_PIN4) << 3);
+}
 
-  commandCode = 0;
+void getcommand (void) {
+  if (digitalRead(COMMAND_PIN0)) { // Only accept commands when enabled
+    commandCode = readCommandCode(); // 0-15
+    times = analogRead(TIMES_PIN) / 100; // scale 0–10
+    speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
 
-  if (digitalRead(COMMAND_PIN0)) {
-      
+    switch (commandCode) {
+      case 0: command = "WF"; break;
+      case 1: command = "WB"; break;
+      case 2: command = "WL"; break;
+      case 3: command = "WR"; break;
+      case 4: command = "TL"; break;
+      case 5: command = "TR"; break;
+      case 6: command = "LF"; break;
+      case 7: command = "LB"; break;
+      case 8: command = "LL"; break;
+      case 9: command = "LR"; break;
+      case 10: command = "FL"; break;
+      case 11: command = "FR"; break;
+      case 12: command = "RL"; break;
+      case 13: command = "RR"; break;
+      case 14: command = "SC"; break;
+      case 15: command = "CH"; break;
+      default: command = ""; break;
+    }
   }
-  
-  command = "WF";
-  
 }
 
 //--------------------------------------------------------------
