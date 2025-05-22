@@ -44,14 +44,15 @@ int speedms;                              // Global variable that stores part th
 boolean userControl = false;                 // Set this to true if you want to control it manually
 
 // ESP32 Communication vars
-#define SPEED_PIN A0
-#define TIMES_PIN A1
+#define SPEED_PIN A2
+#define TIMES_PIN A3
+
 // Commands via binary
-#define COMMAND_PIN0 0 // Accept or deny commands
-#define COMMAND_PIN1 1 // +1
-#define COMMAND_PIN2 2 // +2
-#define COMMAND_PIN3 3 // +4
-#define COMMAND_PIN4 4 // +8
+#define COMMAND_PIN0 12 // Accept or deny commands
+#define COMMAND_PIN1 5 // +1
+#define COMMAND_PIN2 6 // +2
+#define COMMAND_PIN3 7 // +4
+#define COMMAND_PIN4 8 // +8
 
 
 void setup() 
