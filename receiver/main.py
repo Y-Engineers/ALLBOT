@@ -21,7 +21,7 @@ wlan.active(True)
 
 # init ESP-NOW
 esp = espnow.ESPNow()
-esp.active(True)   # esp.init()
+esp.active(True) # esp.init()
 
 print("Waiting for messages...")
 
