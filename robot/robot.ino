@@ -32,23 +32,23 @@ enum MotorName {
   kneeRearRight
 };
 
-long randNumber0;                         // This variable is used for random function
-long randNumber1;                         // This variable is used for random function
-int sounderPin = 13;                      // Declaring what pin the sounder on the VRSSM is connected to
+long randNumber0;                         // this variable is used for random function
+long randNumber1;                         // this variable is used for random function
+int sounderPin = 13;                      // declaring what pin the sounder on the VRSSM is connected to
 
-String command;  // Global variable that stores part of the decoded IR command
-int commandCode = 0; // For selected Command
-int times;                                // Global variable that stores part the received IR command
-int speedms;                              // Global variable that stores part the received IR command
+String command;  // global variable that stores command
+int commandCode = 0; // for selected Command
+int times;
+int speedms;
 
-boolean userControl = false;                 // Set this to true if you want to control it manually
+boolean userControl = false; // set this to true if you want to control it manually
 
 // ESP32 Communication vars
 #define SPEED_PIN A2
 #define TIMES_PIN A3
 
 // Commands via binary
-#define COMMAND_PIN0 12 // Accept or deny commands
+#define COMMAND_PIN0 12 // accept or deny commands
 #define COMMAND_PIN1 5 // +1
 #define COMMAND_PIN2 6 // +2
 #define COMMAND_PIN3 7 // +4
@@ -205,7 +205,7 @@ int readCommandCode() {
 }
 
 void getcommand (void) {
-  if (digitalRead(COMMAND_PIN0)) { // Only accept commands when enabled
+  if (digitalRead(COMMAND_PIN0)) { // only accept commands when enabled
     commandCode = readCommandCode(); // 0-15
     times = analogRead(TIMES_PIN) / 100; // scale 0–10
     speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
@@ -234,7 +234,7 @@ void getcommand (void) {
 
 //--------------------------------------------------------------
 
-void executecommand (void)                // Execute the commands that are stored in the global vars.
+void executecommand (void) // execute commands that are stored in the global vars.
 { 
 
   // 16 commands
@@ -373,7 +373,7 @@ void wavefrontright(int waves, int speedms){
     BOT.animate(speedms);
     
   for (int i = 0; i < waves; i++){
-    BOT.move(hipFrontRight, 0);
+    BOT.move(hipFront# Setup pins for actions (example: LEDs, motors, etc.)Right, 0);
     BOT.animate(speedms);
     
     BOT.move(hipFrontRight, 65);
