@@ -3,13 +3,13 @@
 from machine import Pin, PWM
 
 # communication Pins
-Ptoggle = Pin(1, Pin.OUT) # off->no user control
-PC1 = Pin(2, Pin.OUT) # 1
-PC2 = Pin(3, Pin.OUT) # 2
-PC3 = Pin(4, Pin.OUT) # 4
-PC4 = Pin(5, Pin.OUT) # 8
-Pspeed = PWM(Pin(6), freq=1000)
-Ptimes = PWM(Pin(7), freq=1000)
+Dtoggle = Pin(14, Pin.OUT) # off->no user control
+DC1 = Pin(15, Pin.OUT) # 1
+DC2 = Pin(16, Pin.OUT) # 2
+DC3 = Pin(17, Pin.OUT) # 4
+DC4 = Pin(18, Pin.OUT) # 8
+Aspeed = PWM(Pin(12), freq=1000)
+Atimes = PWM(Pin(13), freq=1000)
 
 
 import network
@@ -26,7 +26,7 @@ esp.active(True)   # esp.init()
 print("Waiting for messages...")
 
 while True:
-    host, msg = e.recv()
+    host, msg = esp.recv()
     if msg:
         print("Received from", host, ":", msg)
 
