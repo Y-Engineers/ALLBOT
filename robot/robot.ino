@@ -42,8 +42,6 @@ int commandCode = 0; // for selected Command
 int times;
 int speedms;
 
-boolean userControl =
-    false; // set this to true if you want to control it manually
 
 // ESP32 Communication vars
 #define SPEED_PIN A2
@@ -216,8 +214,11 @@ int readCommandCode() {
 void getcommand(void) {
 
   commandCode = readCommandCode();     // 0-15
-  times = analogRead(TIMES_PIN) / 100; // scale 0–10
-  speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
+  // times = analogRead(TIMES_PIN) / 100; // scale 0–10
+  // speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
+
+  times = 100;
+  speedms = 100;
 
   switch (commandCode) {
   case 0:
