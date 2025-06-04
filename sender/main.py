@@ -56,7 +56,7 @@ def main() -> None:
     esp.active(True)
 
     # receiver's MAC (get_MAC.py on receiver)
-    peer_mac = b'\xc8\xf0\x9eH\xed\xfc'  # Replace with receiver MAC
+    peer_mac = b'@\x91Q\xab\x8b(' # Replace with receiver MAC
     esp.add_peer(peer_mac)
 
     # loop for user input and sending data
@@ -64,4 +64,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
