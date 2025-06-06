@@ -216,8 +216,8 @@ void getcommand(void) {
   // times = analogRead(TIMES_PIN) / 100; // scale 0–10
   // speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
 
-  times = 100;
-  speedms = 100;
+  times = 10;
+  speedms = 25;
 
   switch (commandCode) {
   case 0:
@@ -804,3 +804,4 @@ void turnright(int steps, int speedms) {
     BOT.animate(speedms);
   }
 }
+
