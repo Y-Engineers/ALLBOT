@@ -112,15 +112,18 @@ void setup() {
 void loop() // Main program loop
 {
 
-  Serial.print(F("Pin 0: ")); Serial.println(digitalRead(COMMAND_PIN0));
-  Serial.print(F("Pin 1: ")); Serial.println(digitalRead(COMMAND_PIN1));
-  Serial.print(F("Pin 2: ")); Serial.println(digitalRead(COMMAND_PIN2));
-  Serial.print(F("Pin 3: ")); Serial.println(digitalRead(COMMAND_PIN3));
-  Serial.print(F("Pin 4: ")); Serial.println(digitalRead(COMMAND_PIN4));
+  Serial.print(F("Pin 0: "));
+  Serial.println(digitalRead(COMMAND_PIN0));
+  Serial.print(F("Pin 1: "));
+  Serial.println(digitalRead(COMMAND_PIN1));
+  Serial.print(F("Pin 2: "));
+  Serial.println(digitalRead(COMMAND_PIN2));
+  Serial.print(F("Pin 3: "));
+  Serial.println(digitalRead(COMMAND_PIN3));
+  Serial.print(F("Pin 4: "));
+  Serial.println(digitalRead(COMMAND_PIN4));
 
-
-
-  if (digitalRead(COMMAND_PIN0)) { // only accept commands when enabled
+  if (!digitalRead(COMMAND_PIN0)) { // only accept commands when enabled
     getcommand();                  // Listen for command
     executecommand();              // Execute any receveid commands
   } /* else {
@@ -213,7 +216,7 @@ void loop() // Main program loop
       randNumber1 = random(1, 5);
       waverearleft(randNumber1, randNumber0);
       break;
-    } 
+    }
   } */
 
   delay(1000);
@@ -230,8 +233,8 @@ void getcommand(void) {
   // times = analogRead(TIMES_PIN) / 100; // scale 0–10
   // speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
 
-  times = 100;
-  speedms = 100;
+  times = 10;
+  speedms = 10;
 
   switch (commandCode) {
   case 0:
