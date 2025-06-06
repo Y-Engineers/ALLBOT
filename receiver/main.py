@@ -1,4 +1,4 @@
-from manual import main
+from receive import main
 
 if __name__ == "__main__":
     main()
