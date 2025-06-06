@@ -11,11 +11,6 @@
  *
  */
 
-/*
- * Modified by Morten Barthel, 2025
- * See LICENSE for details.
- */
-
 #include <ALLBOT.h> // Do not forget to include the ALLBOT library, download it from the manuals.velleman.eu website
 #include <Servo.h>  // The ALLBOT library needs the servo.h library
 
@@ -32,37 +27,21 @@ enum MotorName {
   kneeRearRight
 };
 
-long randNumber0; // this variable is used for random function
-long randNumber1; // this variable is used for random function
+long randNumber0; // This variable is used for random function
+long randNumber1; // This variable is used for random function
 int sounderPin =
-    13; // declaring what pin the sounder on the VRSSM is connected to
+    13; // Declaring what pin the sounder on the VRSSM is connected to
 
-String command;      // global variable that stores command
-int commandCode = 0; // for selected Command
-int times;
-int speedms;
+String rawcommand; // Global variable that stores the raw received IR command
+String command;    // Global variable that stores part of the decoded IR command
+int times;         // Global variable that stores part the received IR command
+int speedms;       // Global variable that stores part the received IR command
 
-// ESP32 Communication vars
-#define SPEED_PIN A2
-#define TIMES_PIN A3
-
-// Commands via binary
-#define COMMAND_PIN0 12 // accept or deny commands
-#define COMMAND_PIN1 5  // +1
-#define COMMAND_PIN2 6  // +2
-#define COMMAND_PIN3 7  // +4
-#define COMMAND_PIN4 8  // +8
+boolean IRreceive = true;  // Set this to true if you want to use the IR remote
+boolean receivelog = true; // Set this to true if you want to see the serial
+                           // messages for debugging the IR commands
 
 void setup() {
-  // ESP32
-  pinMode(SPEED_PIN, INPUT);
-  pinMode(TIMES_PIN, INPUT);
-  pinMode(COMMAND_PIN0, INPUT);
-  pinMode(COMMAND_PIN1, INPUT);
-  pinMode(COMMAND_PIN2, INPUT);
-  pinMode(COMMAND_PIN3, INPUT);
-  pinMode(COMMAND_PIN4, INPUT);
-
   // NAME.attach(motorname, pin, init-angle, flipped, offset-angle);
 
   BOT.attach(
@@ -97,6 +76,15 @@ void setup() {
   // Wait for joints to be initialized
   delay(500);
 
+  // Starting the hardware UART, necessary for receiving IR
+  if (IRreceive == true) // Check if required (when Serial is started servo1
+                         // connector will not work!)
+  {
+    Serial.begin(2400);
+    Serial.setTimeout(100);
+    Serial.println("serial communication started");
+  }
+
   // INIT the random seed, this is used to create random actions
   randomSeed(analogRead(5));
 
@@ -108,9 +96,11 @@ void setup() {
 
 void loop() // Main program loop
 {
-  if (digitalRead(COMMAND_PIN0)) { // only accept commands when enabled
-    getcommand();                  // Listen for command
-    executecommand();              // Execute any receveid commands
+
+  if (IRreceive == true) // Choose between IR commands or random action
+  {
+    getcommand();     // Listen for IR command
+    executecommand(); // Execute any receveid commands
   } else {
     randNumber0 = random(0, 18);
     randNumber1 = random(0, 20);
@@ -205,119 +195,143 @@ void loop() // Main program loop
   }
 }
 //--------------------------------------------------------------
-int readCommandCode() {
-  return (digitalRead(COMMAND_PIN1) << 0) | (digitalRead(COMMAND_PIN2) << 1) |
-         (digitalRead(COMMAND_PIN3) << 2) | (digitalRead(COMMAND_PIN4) << 3);
-}
+void getcommand(void) // This is the routine that listens and decodes any IR
+                      // commands. Decodes commands end up in the global vars.
+{
+  int space1 = 0;
+  int space2 = 0;
 
-void getcommand(void) {
+  if (Serial.available()) {
+    rawcommand = Serial.readString();
+    if (receivelog) {
+      Serial.println("START " + rawcommand + " END" + "\n" +
+                     "Received string length = " + rawcommand.length() + "\n" +
+                     "End character > at index = " + rawcommand.indexOf('>'));
+    }
 
-  commandCode = readCommandCode(); // 0-15
-  // times = analogRead(TIMES_PIN) / 100; // scale 0–10
-  // speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
+    // checking and deleting rubbish data at start of received command
+    if ((rawcommand.indexOf('<') != 0) && (rawcommand.indexOf('<') != -1)) {
+      rawcommand.remove(0, rawcommand.indexOf('<'));
+    }
 
-  times = 100;
-  speedms = 100;
+    // check if received command is correct
+    if ((rawcommand.charAt(0) == '<') && (rawcommand.indexOf('>') <= 12) &&
+        (rawcommand.indexOf('>') != -1) && (rawcommand.length() > 7)) {
+      if (receivelog) {
+        Serial.println("Command is VALID");
+      }
+      // breakdown into chunks
+      // command
+      command = rawcommand.substring(1, 3);
 
-  switch (commandCode) {
-  case 0:
-    command = "WF";
-    break;
-  case 1:
-    command = "WB";
-    break;
-  case 2:
-    command = "WL";
-    break;
-  case 3:
-    command = "WR";
-    break;
-  case 4:
-    command = "TL";
-    break;
-  case 5:
-    command = "TR";
-    break;
-  case 6:
-    command = "LF";
-    break;
-  case 7:
-    command = "LB";
-    break;
-  case 8:
-    command = "LL";
-    break;
-  case 9:
-    command = "LR";
-    break;
-  case 10:
-    command = "FL";
-    break;
-  case 11:
-    command = "FR";
-    break;
-  case 12:
-    command = "RL";
-    break;
-  case 13:
-    command = "RR";
-    break;
-  case 14:
-    command = "SC";
-    break;
-  case 15:
-    command = "CH";
-    break;
-  default:
-    command = "";
-    break;
+      // finding the spaces to find the times and speedms
+      for (int i = 0; i <= rawcommand.length(); i++) {
+        if ((rawcommand.charAt(i) == ' ') && (space1 == 0)) {
+          space1 = i;
+        } else if ((rawcommand.charAt(i) == ' ') && (space2 == 0)) {
+          space2 = i;
+        }
+      }
+
+      // Setting the command variables and checking if they are indeed a number
+      // (toInt()).
+
+      // times
+      times = rawcommand.substring(space1 + 1, space2).toInt();
+
+      // speedms
+      speedms =
+          rawcommand.substring(space2 + 1, rawcommand.indexOf('>')).toInt();
+
+      if (receivelog) {
+        Serial.println("decoded commands are:");
+        Serial.flush();
+        Serial.println("command = " + command);
+        Serial.flush();
+        Serial.println("times = " + times);
+        Serial.flush();
+        Serial.println("speedms = " + speedms);
+      }
+
+    } else {
+      if (receivelog) {
+        Serial.println("Command is NOT valid");
+      }
+      resetserial();
+    }
   }
 }
-
 //--------------------------------------------------------------
-
-void executecommand(
-    void) // execute commands that are stored in the global vars.
+void resetserial(
+    void) // This clears any received IR commands that where received in the
+          // serial buffer while the robot was execution a command.
 {
+  // resetting all variables
+  rawcommand = "";
+  command = "";
+  times = 0;
+  speedms = 0;
 
-  // 16 commands
+  // flushing the serial buffer (64 byte) so there are no stored movements that
+  // need to be handled (annoying)...
+  while (Serial.available()) {
+    Serial.read();
+  }
+}
+//--------------------------------------------------------------
+void executecommand(
+    void) // Execute the commands that are stored in the global vars.
+{
   if (command == "WF") {
     walkforward(times, (speedms * 5));
+    resetserial();
   } else if (command == "WB") {
     walkbackward(times, (speedms * 5));
+    resetserial();
   } else if (command == "WL") {
     walkleft(times, (speedms * 5));
+    resetserial();
   } else if (command == "WR") {
     walkright(times, (speedms * 5));
+    resetserial();
   } else if (command == "TR") {
     turnright(times, (speedms * 5));
+    resetserial();
   } else if (command == "TL") {
     turnleft(times, (speedms * 5));
+    resetserial();
   } else if (command == "LF") {
     leanforward(speedms * 5);
+    resetserial();
   } else if (command == "LB") {
     leanbackward(speedms * 5);
+    resetserial();
   } else if (command == "LL") {
     leanleft(speedms * 5);
+    resetserial();
   } else if (command == "LR") {
     leanright(speedms * 5);
+    resetserial();
   } else if (command == "FR") {
     wavefrontright(times, speedms * 5);
+    resetserial();
   } else if (command == "FL") {
     wavefrontleft(times, speedms * 5);
+    resetserial();
   } else if (command == "RR") {
     waverearright(times, speedms * 5);
+    resetserial();
   } else if (command == "RL") {
     waverearleft(times, speedms * 5);
+    resetserial();
   } else if (command == "SC") {
     scared(times, speedms);
+    resetserial();
   } else if (command == "CH") {
     chirp(times, speedms);
+    resetserial();
   }
 }
-
-//--------------------------------------------------------------
-// Movements
 //--------------------------------------------------------------
 void chirp(int beeps, int speedms) {
 
@@ -804,3 +818,4 @@ void turnright(int steps, int speedms) {
     BOT.animate(speedms);
   }
 }
+//--------------------------------------------------------------
