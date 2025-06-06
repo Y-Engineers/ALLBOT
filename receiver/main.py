@@ -1,21 +1,19 @@
-# receiver
-
 from machine import Pin, DAC
 import network
 import espnow
 
 # Pin definitions
-Dtoggle = Pin(14, Pin.OUT)
+Dtoggle = Pin(19, Pin.OUT)
 
 # 4-bit command output pins
-DC1 = Pin(15, Pin.OUT)  # Bit 0 (LSB)
-DC2 = Pin(16, Pin.OUT)  # Bit 1
-DC3 = Pin(17, Pin.OUT)  # Bit 2
-DC4 = Pin(18, Pin.OUT)  # Bit 3 (MSB)
+DC1 = Pin(12, Pin.OUT)  # Bit 0 (LSB)
+DC2 = Pin(14, Pin.OUT)  # Bit 1
+DC3 = Pin(27, Pin.OUT)  # Bit 2
+DC4 = Pin(16, Pin.OUT)  # Bit 3 (MSB)
 
 # DAC output pins
-Aspeed = DAC(Pin(25))   # GPIO25 = DAC1
-Atimes = DAC(Pin(26))   # GPIO26 = DAC2
+# Aspeed = DAC(Pin(36))   # GPIO25 = DAC1
+# Atimes = DAC(Pin(34))   # GPIO26 = DAC2
 
 def setup_wifi_and_espnow():
     wlan = network.WLAN(network.STA_IF)
@@ -53,12 +51,12 @@ def handle_message(msg: bytes):
         return
 
     # Clamp DAC values to 0–255
-    times = max(0, min(255, times))
-    speed = max(0, min(255, speed))
+    # times = max(0, min(255, times))
+    # speed = max(0, min(255, speed))
 
     # Set DAC values
-    Aspeed.write(speed)
-    Atimes.write(times)
+    # Aspeed.write(speed)
+    # Atimes.write(times)
 
     # Set 4-bit command on digital pins
     for i, pin in enumerate((DC1, DC2, DC3, DC4)):
