@@ -15,11 +15,11 @@ DC4 = Pin(16, Pin.OUT)  # Bit 3 (MSB)
 
 def main():
     while True:
-        Dtoggle.on()
-        DC1.value(1)
-        DC2.value(1)
-        DC3.value(1)
-        DC4.value(1)
+        Dtoggle.off()
+        DC1.value(0)
+        DC2.value(0)
+        DC3.value(0)
+        DC4.value(0)
 
 # Run main
 if __name__ == "__main__":

@@ -108,7 +108,7 @@ void setup() {
 
 void loop() // Main program loop
 {
-  if (digitalRead(COMMAND_PIN0)) { // only accept commands when enabled
+  if (!digitalRead(COMMAND_PIN0)) { // only accept commands when enabled
     getcommand();                  // Listen for command
     executecommand();              // Execute any receveid commands
   } else {
