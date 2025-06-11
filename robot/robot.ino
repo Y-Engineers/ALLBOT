@@ -43,8 +43,10 @@ int times;
 int speedms;
 
 // ESP32 Communication vars
-#define SPEED_PIN A2
-#define TIMES_PIN A3
+
+// NOT used due to pin limitation
+// #define SPEED_PIN A2
+// #define TIMES_PIN A3
 
 // Commands via binary
 #define COMMAND_PIN0 12 // accept or deny commands
@@ -55,8 +57,10 @@ int speedms;
 
 void setup() {
   // ESP32
-  pinMode(SPEED_PIN, INPUT);
-  pinMode(TIMES_PIN, INPUT);
+  // NOT used to pin limitation
+  // pinMode(SPEED_PIN, INPUT);
+  // pinMode(TIMES_PIN, INPUT);
+  // Pins for receiving commands
   pinMode(COMMAND_PIN0, INPUT);
   pinMode(COMMAND_PIN1, INPUT);
   pinMode(COMMAND_PIN2, INPUT);
@@ -109,9 +113,11 @@ void setup() {
 void loop() // Main program loop
 {
   if (!digitalRead(COMMAND_PIN0)) { // only accept commands when enabled
+                                    // not turned on to not have unintended execution
     getcommand();                  // Listen for command
     executecommand();              // Execute any receveid commands
   } else {
+        // If communication is disabled does random actions
     randNumber0 = random(0, 18);
     randNumber1 = random(0, 20);
     delay(randNumber1 * 100);
@@ -206,19 +212,24 @@ void loop() // Main program loop
 }
 //--------------------------------------------------------------
 int readCommandCode() {
+  // return value from 0-15
+  // each value corresponds to one specific command 
   return (digitalRead(COMMAND_PIN1) << 0) | (digitalRead(COMMAND_PIN2) << 1) |
          (digitalRead(COMMAND_PIN3) << 2) | (digitalRead(COMMAND_PIN4) << 3);
 }
 
 void getcommand(void) {
 
+  // get a code from which pins are high/low from ESP32
   commandCode = readCommandCode(); // 0-15
   // times = analogRead(TIMES_PIN) / 100; // scale 0–10
   // speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
 
+  // set manually because not enough analog pins exist
   times = 1;
   speedms = 25;
 
+  // get command based on value from readCommandCode
   switch (commandCode) {
   case 0:
     command = "WF";
