@@ -216,7 +216,7 @@ void getcommand(void) {
   // times = analogRead(TIMES_PIN) / 100; // scale 0–10
   // speedms = analogRead(SPEED_PIN) / 4; // scale 0–255
 
-  times = 10;
+  times = 1;
   speedms = 25;
 
   switch (commandCode) {
